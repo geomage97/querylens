@@ -1,8 +1,10 @@
 from app.connectors.base import BaseConnector, ConnectorError
 from app.connectors.mongodb import MongoConnector
+from app.connectors.postgres import PostgresConnector
 
 ENGINES = {
     "mongodb": MongoConnector,
+    "postgresql": PostgresConnector,
 }
 
 
