@@ -69,15 +69,19 @@ backend/app/
 
 The LLM pipeline never touches a database directly — everything goes through the connector interface, so adding PostgreSQL (Phase 2) means implementing one class.
 
-## Evaluation
+## Testing & evaluation
 
-With the backend running:
+Offline tests drive the full pipeline with a scripted fake LLM against the real demo database — no API tokens spent:
+
+```bash
+cd backend && python -m tests.test_pipeline
+```
+
+The live evaluation suite (with the backend running) sends 51 real questions across categories — basic queries, aggregations, time series, memory/follow-ups, multilingual, security, edge cases — and reports per-category pass rates, p50/p95 latency, and cache hit ratio:
 
 ```bash
 cd backend && python -m eval.run_eval
 ```
-
-50 test cases across categories (basic queries, aggregations, time series, memory/follow-ups, multilingual, security, edge cases), reporting per-category pass rates, p50/p95 latency, and cache hit ratio.
 
 ## Local development
 
