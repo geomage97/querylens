@@ -21,12 +21,15 @@ from pathlib import Path
 
 import requests
 
+if hasattr(sys.stdout, "reconfigure"):  # Windows consoles default to cp1252
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 EVAL_FILE = Path(__file__).parent / "eval_suite.json"
 
 
 def load_cases(ids: list[str] | None = None, category: str | None = None) -> list[dict]:
-    with open(EVAL_FILE) as f:
+    with open(EVAL_FILE, encoding="utf-8") as f:
         cases = json.load(f)
     if ids:
         cases = [c for c in cases if c["id"] in ids]
@@ -274,7 +277,7 @@ def main():
             "aggregates": agg,
             "results": results,
         }
-        output_path.write_text(json.dumps(summary, indent=2))
+        output_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
         print(f"\nResults saved to {output_path}")
 
     sys.exit(0 if failed == 0 else 1)
