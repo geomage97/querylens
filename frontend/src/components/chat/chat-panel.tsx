@@ -57,7 +57,7 @@ export function ChatPanel() {
     setMessages((m) => [
       ...m,
       { id: uid(), role: "user", text: question },
-      { id: uid(), role: "assistant", text: "", stage: "generating_query" },
+      { id: uid(), role: "assistant", text: "", question, stage: "generating_query" },
     ]);
     scrollDown();
 
