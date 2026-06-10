@@ -26,6 +26,6 @@ class ChatResponse(BaseModel):
 
 class ConnectionCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    engine: Literal["mongodb"]  # "postgresql" arrives in Phase 2
+    engine: Literal["mongodb", "postgresql"]
     uri: str = Field(..., min_length=1)
     database: str = Field(..., min_length=1)

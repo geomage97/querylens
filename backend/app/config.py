@@ -13,9 +13,11 @@ class Settings(BaseSettings):
     APP_MONGODB_URI: str = "mongodb://localhost:27017"
     APP_DATABASE: str = "querylens"
 
-    # Demo connection seeded at startup (points at the bundled e-commerce dataset)
+    # Demo connections registered at startup (bundled datasets)
     DEMO_MONGODB_URI: str = "mongodb://localhost:27017"
     DEMO_DATABASE: str = "demo_ecommerce"
+    DEMO_POSTGRES_URI: str = "postgresql://querylens:querylens@localhost:5432"
+    DEMO_POSTGRES_DATABASE: str = "demo_hr"
 
     # Query execution
     MAX_QUERY_RESULTS: int = 0  # 0 = unlimited; positive number enforces a cap

@@ -64,14 +64,14 @@ class ConnectionRegistry:
         result = self._collection.delete_one({"connection_id": connection_id})
         return result.deleted_count > 0
 
-    def ensure_demo(self, uri: str, database: str) -> None:
-        """Seed the bundled demo connection on first startup."""
-        if self._collection.count_documents({"name": "demo-ecommerce"}) == 0:
+    def ensure_demo(self, name: str, engine: str, uri: str, database: str) -> None:
+        """Register a bundled demo connection on first startup (idempotent)."""
+        if self._collection.count_documents({"name": name}) == 0:
             try:
-                self.add(name="demo-ecommerce", engine="mongodb", uri=uri, database=database)
-                print(f"Registered demo connection -> {database}")
+                self.add(name=name, engine=engine, uri=uri, database=database)
+                print(f"Registered demo connection '{name}' -> {engine}/{database}")
             except ConnectorError as e:
-                print(f"WARNING: demo connection unavailable: {e}")
+                print(f"WARNING: demo connection '{name}' unavailable: {e}")
 
     # -- Live access --------------------------------------------------------
 

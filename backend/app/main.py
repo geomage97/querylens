@@ -25,7 +25,10 @@ async def lifespan(app: FastAPI):
         schema_sample_size=settings.SCHEMA_SAMPLE_SIZE,
         schema_cache_ttl=settings.SCHEMA_CACHE_TTL,
     )
-    registry.ensure_demo(settings.DEMO_MONGODB_URI, settings.DEMO_DATABASE)
+    registry.ensure_demo("demo-ecommerce", "mongodb",
+                         settings.DEMO_MONGODB_URI, settings.DEMO_DATABASE)
+    registry.ensure_demo("demo-hr", "postgresql",
+                         settings.DEMO_POSTGRES_URI, settings.DEMO_POSTGRES_DATABASE)
 
     llm = ChatAnthropic(
         model=settings.LLM_MODEL,
