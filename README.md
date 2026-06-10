@@ -34,7 +34,7 @@ curl -N localhost:8000/chat/stream -X POST -H "Content-Type: application/json" \
 - **Streaming** — `/chat/stream` emits SSE events: pipeline status, the generated query, answer tokens as they're written, then the full result.
 - **Prompt caching** — the schema-aware system prompt is sent as a cached content block, cutting cost and latency on repeated questions.
 - **Multiple connections** — register any reachable MongoDB or PostgreSQL instance via `POST /connections`; two seeded demo databases ship in the compose file (e-commerce in Mongo, HR in Postgres).
-- **Observability** — every interaction is logged with tokens, latency, and outcome; `/health` reports aggregate stats. A 50-case evaluation suite measures pass rates per category.
+- **Observability** — every interaction is logged with tokens, latency, and outcome; `/health` reports aggregate stats. A 62-case evaluation suite measures pass rates per category.
 
 ## API
 
