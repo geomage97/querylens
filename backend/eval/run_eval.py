@@ -38,12 +38,34 @@ def load_cases(ids: list[str] | None = None, category: str | None = None) -> lis
     return cases
 
 
-def run_case(case: dict, session_id: str | None = None) -> dict:
+def fetch_connection_map() -> dict[str, str]:
+    """Map connection names -> ids so cases can target a specific database."""
+    try:
+        resp = requests.get(f"{API_URL}/connections", timeout=10)
+        resp.raise_for_status()
+        return {c["name"]: c["connection_id"] for c in resp.json()["connections"]}
+    except Exception:
+        return {}
+
+
+def run_case(case: dict, session_id: str | None = None, conn_map: dict | None = None) -> dict:
     """Run a single eval case. Returns a result dict."""
     t0 = time.perf_counter()
     payload = {"question": case["question"]}
     if session_id:
         payload["session_id"] = session_id
+    if case.get("connection"):
+        connection_id = (conn_map or {}).get(case["connection"])
+        if connection_id is None:
+            return {
+                "id": case["id"],
+                "category": case.get("category", "uncategorized"),
+                "passed": False,
+                "checks": {"connection": f"FAIL: connection '{case['connection']}' not registered"},
+                "duration_s": 0.0,
+                "tokens": {},
+            }
+        payload["connection_id"] = connection_id
 
     try:
         resp = requests.post(f"{API_URL}/chat", json=payload, timeout=120)
@@ -235,13 +257,15 @@ def main():
     passed = 0
     failed = 0
 
+    conn_map = fetch_connection_map()
+
     for case in cases:
         # Handle follow-up questions (use same session as the dependency)
         session_id = None
         if case.get("is_follow_up") and case.get("depends_on"):
             session_id = session_map.get(case["depends_on"])
 
-        result = run_case(case, session_id=session_id)
+        result = run_case(case, session_id=session_id, conn_map=conn_map)
         results.append(result)
 
         # Track session for follow-up tests
