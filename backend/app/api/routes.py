@@ -156,6 +156,15 @@ def sessions(request: Request, limit: int = 20):
     return {"sessions": request.app.state.conversations.list_sessions(limit=limit)}
 
 
+@router.get("/sessions/{session_id}/messages")
+def session_messages(request: Request, session_id: str):
+    """Full stored history for one session (used by the UI to resume a chat)."""
+    return {
+        "session_id": session_id,
+        "messages": request.app.state.conversations.get_history(session_id),
+    }
+
+
 @router.delete("/sessions/{session_id}")
 def delete_session(request: Request, session_id: str):
     request.app.state.conversations.clear(session_id)
