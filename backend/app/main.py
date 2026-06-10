@@ -10,6 +10,7 @@ from app.config import get_settings
 from app.connectors.registry import ConnectionRegistry
 from app.llm.pipeline import QueryPipeline
 from app.store.conversations import ConversationStore
+from app.store.dashboard import DashboardStore
 from app.store.query_logger import QueryLogger
 
 
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
     app.state.meta_db = meta_db
     app.state.registry = registry
     app.state.conversations = ConversationStore(meta_db)
+    app.state.dashboard = DashboardStore(meta_db)
     app.state.query_logger = query_logger
     app.state.pipeline = pipeline
     print(f"QueryLens ready | model={settings.LLM_MODEL} | meta_db={settings.APP_DATABASE}")

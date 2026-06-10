@@ -1,11 +1,12 @@
 import json
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import AIMessage, HumanMessage
 
-from app.api.models import ChatRequest, ChatResponse, ConnectionCreate
+from app.api.models import ChatRequest, ChatResponse, ConnectionCreate, DashboardCardCreate
 from app.connectors.base import ConnectorError
 
 router = APIRouter()
@@ -169,6 +170,72 @@ def session_messages(request: Request, session_id: str):
 def delete_session(request: Request, session_id: str):
     request.app.state.conversations.clear(session_id)
     return {"ok": True, "session_id": session_id}
+
+
+# -- Dashboard ----------------------------------------------------------------
+
+
+@router.get("/dashboard/cards")
+def list_cards(request: Request):
+    return {"cards": request.app.state.dashboard.list()}
+
+
+@router.post("/dashboard/cards", status_code=201)
+def add_card(request: Request, body: DashboardCardCreate):
+    """Pin a query to the dashboard. The connection must exist."""
+    if request.app.state.registry.get(body.connection_id) is None:
+        raise HTTPException(status_code=404, detail=f"Unknown connection: {body.connection_id}")
+    return request.app.state.dashboard.add(
+        title=body.title,
+        question=body.question,
+        connection_id=body.connection_id,
+        generated_query=body.generated_query,
+        visualization_hint=body.visualization_hint,
+    )
+
+
+@router.delete("/dashboard/cards/{card_id}")
+def delete_card(request: Request, card_id: str):
+    if not request.app.state.dashboard.delete(card_id):
+        raise HTTPException(status_code=404, detail=f"Unknown card: {card_id}")
+    return {"ok": True, "card_id": card_id}
+
+
+@router.post("/dashboard/cards/{card_id}/run")
+def run_card(request: Request, card_id: str):
+    """Re-execute a card's saved query — no LLM involved.
+
+    The stored query is re-validated against the connection's current schema
+    before every run; a card is never a backdoor around read-only enforcement.
+    """
+    card = request.app.state.dashboard.get(card_id)
+    if card is None:
+        raise HTTPException(status_code=404, detail=f"Unknown card: {card_id}")
+
+    registry = request.app.state.registry
+    try:
+        connector = registry.connector(card["connection_id"])
+        schema = registry.schema(card["connection_id"])
+    except ConnectorError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+    is_valid, error = connector.validate_query(card["generated_query"], schema)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=f"Saved query failed validation: {error}")
+
+    try:
+        result = connector.execute(
+            card["generated_query"], request.app.state.settings.MAX_QUERY_RESULTS
+        )
+    except ConnectorError as e:
+        raise HTTPException(status_code=502, detail=f"Execution failed: {e}")
+
+    return {
+        "card_id": card_id,
+        "data": result["results"],
+        "record_count": result["count"],
+        "refreshed_at": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 # -- Health ----------------------------------------------------------------
