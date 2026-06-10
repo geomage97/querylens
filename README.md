@@ -4,7 +4,9 @@
 
 > Built with FastAPI + Claude (`claude-opus-4-8`) with prompt caching, streaming responses, and strict read-only query enforcement — and a Next.js UI with a streaming chat, query inspector, and schema explorer.
 
-![QueryLens chat](docs/screenshots/chat-postgresql.png)
+![QueryLens chat](docs/screenshots/chat-chart.png)
+
+![QueryLens dashboard](docs/screenshots/dashboard.png)
 
 ## Quick start
 
@@ -39,6 +41,7 @@ curl -N localhost:8000/chat/stream -X POST -H "Content-Type: application/json" \
 - **Prompt caching** — the schema-aware system prompt is sent as a cached content block, cutting cost and latency on repeated questions.
 - **Multiple connections** — register any reachable MongoDB or PostgreSQL instance via `POST /connections`; two seeded demo databases ship in the compose file (e-commerce in Mongo, HR in Postgres).
 - **Product UI** — streaming chat with live pipeline stages, a per-answer query inspector (exact query, latency, token usage), sortable results with CSV/JSON export, session history, a connections manager, and a schema explorer.
+- **Charts & dashboards** — bar/pie/line charts (Recharts) with a chart/table toggle, inferred from the result shape. Pin any answer to the dashboard: cards re-run their saved query directly through the connector — fresh data with zero LLM calls, and the stored query still passes read-only validation on every run.
 - **Observability** — every interaction is logged with tokens, latency, and outcome; `/health` reports aggregate stats. A 62-case evaluation suite measures pass rates per category.
 
 ## API
@@ -54,6 +57,7 @@ curl -N localhost:8000/chat/stream -X POST -H "Content-Type: application/json" \
 | GET | `/connections/{id}/schema` | The auto-discovered schema (`?refresh=true` to re-infer) |
 | GET | `/sessions` | Recent conversations |
 | DELETE | `/sessions/{id}` | Delete a conversation |
+| GET/POST/DELETE | `/dashboard/cards`... | Pinned cards CRUD + LLM-free `/run` refresh |
 | GET | `/health` | Service health + query stats |
 
 ## Architecture
@@ -117,5 +121,5 @@ npm run dev        # http://localhost:3000
 - [x] **Phase 1** — MongoDB connector, schema inference, SSE streaming, self-correction, eval suite
 - [x] **Phase 2** — PostgreSQL connector (SQL generation + `information_schema` discovery)
 - [x] **Phase 3** — Next.js frontend: chat, connections manager, schema explorer, query inspector
-- [ ] **Phase 4** — Charts (Recharts), pin-to-dashboard, saved queries
+- [x] **Phase 4** — Charts (Recharts), pin-to-dashboard, saved queries
 - [ ] **Phase 5** — CI, tests, demo GIF, v1.0

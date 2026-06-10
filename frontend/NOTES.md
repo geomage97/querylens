@@ -73,3 +73,21 @@ base URL live in exactly one place.
 built on Base UI: composition uses a `render` prop
 (`<DialogTrigger render={<Button />}>`), unlike the older Radix-based
 `asChild` pattern you'll see in most tutorials.
+
+## 10. Charts from arbitrary data: inference + composition (Recharts)
+
+[chart-view.tsx](src/components/chat/chart-view.tsx) can't know the result
+columns in advance, so `inferChart` picks the first non-numeric column as the
+label axis and the numeric columns as series. Recharts is *compositional*:
+a chart is JSX (`<BarChart><XAxis/><Bar/></BarChart>`), so swapping bar/line/
+pie is just rendering different children. `ResponsiveContainer` makes the
+chart fill whatever space its parent gives it.
+
+## 11. Independent data per component instance
+
+Each dashboard card ([dashboard/page.tsx](src/app/dashboard/page.tsx)) calls
+`useQuery` with its own key (`["card-run", card.card_id]`). Hooks belong to a
+component *instance*, so ten cards means ten independent queries — each one
+loads, refreshes, and fails on its own without any coordination code. That's
+the React mental model in one example: state and effects scale by composing
+components, not by writing a manager.
