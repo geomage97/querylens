@@ -12,7 +12,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     answer: str
     data: Optional[Any] = None
-    visualization_hint: Literal["table", "number", "list", "bar_chart", "pie_chart", "none"] = "none"
+    visualization_hint: Literal["table", "number", "list", "bar_chart", "pie_chart", "line_chart", "none"] = "none"
     record_count: int = 0
     query_summary: str = ""
     generated_query: Optional[dict] = None
@@ -29,3 +29,13 @@ class ConnectionCreate(BaseModel):
     engine: Literal["mongodb", "postgresql"]
     uri: str = Field(..., min_length=1)
     database: str = Field(..., min_length=1)
+
+
+class DashboardCardCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=120)
+    question: str = Field(..., min_length=1, max_length=4000)
+    connection_id: str
+    generated_query: dict
+    visualization_hint: Literal[
+        "table", "number", "list", "bar_chart", "pie_chart", "line_chart", "none"
+    ] = "table"

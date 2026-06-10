@@ -190,7 +190,7 @@ class MongoConnector(BaseConnector):
     "projection": "object (optional) — fields to include (1) or exclude (0)",
     "sort": "object (optional) — sort specification",
     "limit": "integer (optional) — only set when the user asks for a specific number (e.g. top 5)",
-    "visualization_hint": "string — one of: table, number, list, bar_chart, pie_chart, none",
+    "visualization_hint": "string — one of: table, number, list, bar_chart, pie_chart, line_chart, none",
     "query_summary": "string — brief plain-language description of the query"
 }
 
@@ -207,6 +207,7 @@ class MongoConnector(BaseConnector):
    answering with a join over declining the question.
 9. Pick the visualization_hint that best fits the expected result shape:
    - single value -> number, grouped totals -> bar_chart or pie_chart,
+   - values over time (per day/month/year) -> line_chart,
    - record listings -> table, short name lists -> list."""
 
     def few_shot_examples(self) -> str:

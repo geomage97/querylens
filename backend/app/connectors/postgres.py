@@ -246,7 +246,7 @@ class PostgresConnector(BaseConnector):
         return """## Required JSON Schema
 {
     "sql": "string — a single PostgreSQL SELECT statement",
-    "visualization_hint": "string — one of: table, number, list, bar_chart, pie_chart, none",
+    "visualization_hint": "string — one of: table, number, list, bar_chart, pie_chart, line_chart, none",
     "query_summary": "string — brief plain-language description of the query"
 }
 
@@ -263,6 +263,7 @@ class PostgresConnector(BaseConnector):
 7. Use explicit column lists or aliases so result columns have readable names.
 8. Pick the visualization_hint that best fits the expected result shape:
    - single value -> number, grouped totals -> bar_chart or pie_chart,
+   - values over time (per day/month/year) -> line_chart,
    - record listings -> table, short name lists -> list."""
 
     def few_shot_examples(self) -> str:
