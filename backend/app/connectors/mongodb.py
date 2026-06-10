@@ -202,7 +202,10 @@ class MongoConnector(BaseConnector):
 5. Omit "limit" unless the user explicitly asks for a limited number of results.
 6. For text search use $regex with $options: "i".
 7. Array-of-object fields are shown as "field[].subfield" in the schema — $unwind the array before grouping on its subfields.
-8. Pick the visualization_hint that best fits the expected result shape:
+8. To combine data across collections, use $lookup joined on the shared id
+   fields visible in the schema, then $unwind the joined array. Prefer
+   answering with a join over declining the question.
+9. Pick the visualization_hint that best fits the expected result shape:
    - single value -> number, grouped totals -> bar_chart or pie_chart,
    - record listings -> table, short name lists -> list."""
 
@@ -256,6 +259,21 @@ class MongoConnector(BaseConnector):
                     ],
                     "visualization_hint": "bar_chart",
                     "query_summary": "Revenue per category from order line items",
+                },
+            },
+            {
+                "q": "Average comment score per article topic",
+                "a": {
+                    "collection": "comments",
+                    "operation": "aggregate",
+                    "query": [
+                        {"$lookup": {"from": "articles", "localField": "article_id", "foreignField": "article_id", "as": "article"}},
+                        {"$unwind": "$article"},
+                        {"$group": {"_id": "$article.topic", "avg_score": {"$avg": "$score"}, "comments": {"$sum": 1}}},
+                        {"$sort": {"avg_score": -1}},
+                    ],
+                    "visualization_hint": "bar_chart",
+                    "query_summary": "Joined comments to articles and averaged scores by topic",
                 },
             },
             {
