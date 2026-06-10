@@ -3,12 +3,15 @@
 // handling, and types live in one spot.
 
 import type {
+  CardRunResult,
   Connection,
+  DashboardCard,
   Engine,
   Schema,
   SessionMessage,
   SessionSummary,
   StreamEvent,
+  VisualizationHint,
 } from "@/lib/types";
 
 export const API_URL =
@@ -79,6 +82,31 @@ export async function getSessionMessages(sessionId: string): Promise<SessionMess
   // resuming loads history lazily via this helper.)
   const body = await request<{ messages: SessionMessage[] }>(`/sessions/${sessionId}/messages`);
   return body.messages;
+}
+
+// -- Dashboard ------------------------------------------------------------------
+
+export async function listCards(): Promise<DashboardCard[]> {
+  const body = await request<{ cards: DashboardCard[] }>("/dashboard/cards");
+  return body.cards;
+}
+
+export function addCard(input: {
+  title: string;
+  question: string;
+  connection_id: string;
+  generated_query: Record<string, unknown>;
+  visualization_hint: VisualizationHint;
+}): Promise<DashboardCard> {
+  return request("/dashboard/cards", { method: "POST", body: JSON.stringify(input) });
+}
+
+export function deleteCard(cardId: string): Promise<{ ok: boolean }> {
+  return request(`/dashboard/cards/${cardId}`, { method: "DELETE" });
+}
+
+export function runCard(cardId: string): Promise<CardRunResult> {
+  return request(`/dashboard/cards/${cardId}/run`, { method: "POST" });
 }
 
 // -- Chat (streaming) -----------------------------------------------------------

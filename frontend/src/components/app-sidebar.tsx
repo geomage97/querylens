@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ConnectionSwitcher } from "@/components/connection-switcher";
 import { cn } from "@/lib/utils";
-import { MessageSquare, Network, Plug, ScanSearch } from "lucide-react";
+import { LayoutDashboard, MessageSquare, Network, Plug, ScanSearch } from "lucide-react";
 
 const NAV = [
   { href: "/", label: "Chat", icon: MessageSquare },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/connections", label: "Connections", icon: Plug },
   { href: "/schema", label: "Schema", icon: Network },
 ];

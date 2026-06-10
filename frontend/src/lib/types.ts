@@ -37,6 +37,7 @@ export type VisualizationHint =
   | "list"
   | "bar_chart"
   | "pie_chart"
+  | "line_chart"
   | "none";
 
 export interface TokenStats {
@@ -82,3 +83,20 @@ export type StreamEvent =
   | { event: "delta"; data: { text: string } }
   | { event: "result"; data: ChatResult }
   | { event: "done"; data: Record<string, never> };
+
+export interface DashboardCard {
+  card_id: string;
+  title: string;
+  question: string;
+  connection_id: string;
+  generated_query: Record<string, unknown>;
+  visualization_hint: VisualizationHint;
+  created_at: string | null;
+}
+
+export interface CardRunResult {
+  card_id: string;
+  data: Record<string, unknown>[];
+  record_count: number;
+  refreshed_at: string;
+}
