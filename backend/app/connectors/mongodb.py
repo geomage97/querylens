@@ -203,8 +203,10 @@ class MongoConnector(BaseConnector):
 6. For text search use $regex with $options: "i".
 7. Array-of-object fields are shown as "field[].subfield" in the schema — $unwind the array before grouping on its subfields.
 8. To combine data across collections, use $lookup joined on the shared id
-   fields visible in the schema, then $unwind the joined array. Prefer
-   answering with a join over declining the question.
+   fields visible in the schema, then $unwind the joined array. A shared id
+   field (the same *_id appearing in both collections) IS a reliable join key —
+   never decline a question that one $lookup on such a key can answer, even if
+   the attribute being asked about lives only in the joined collection.
 9. Pick the visualization_hint that best fits the expected result shape:
    - single value -> number, grouped totals -> bar_chart or pie_chart,
    - values over time (per day/month/year) -> line_chart,
