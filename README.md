@@ -1,5 +1,8 @@
 # QueryLens
 
+[![CI](https://github.com/geomage97/querylens/actions/workflows/ci.yml/badge.svg)](https://github.com/geomage97/querylens/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 **Chat with your database.** Connect a MongoDB or PostgreSQL database, let QueryLens discover its schema automatically, and ask questions in plain language — get back answers, the exact query that ran, and chart-ready data.
 
 > Built with FastAPI + Claude (`claude-opus-4-8`) with prompt caching, streaming responses, and strict read-only query enforcement — and a Next.js UI with a streaming chat, query inspector, and schema explorer.
