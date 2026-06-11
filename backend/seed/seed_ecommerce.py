@@ -167,7 +167,7 @@ def main():
     tr=sum(o["total"] for o in orders); ao=tr/len(orders) if orders else 0
     print(f"\n{'─'*60}\n  Customers:       {len(customers):>6,}\n  Sellers:         {len(sellers):>6,}\n  Products:        {len(products):>6,}\n  Orders:          {len(orders):>6,}\n  Reviews:         {len(reviews):>6,}\n  Total Revenue:   €{tr:>12,.2f}\n  Avg Order Value: €{ao:>12,.2f}\n  Countries:       {len(COUNTRIES):>6}\n  Categories:      {len(CATEGORIES):>6}\n{'─'*60}")
     print(f"\nExporting JSON -> {args.output_dir}"); export_json(data,args.output_dir)
-    if not args.json_only: print(f"\nInserting into MongoDB..."); insert_mongo(data,args.uri,args.db,args.drop)
+    if not args.json_only: print("\nInserting into MongoDB..."); insert_mongo(data,args.uri,args.db,args.drop)
     print("\nDone!")
 
 if __name__=="__main__": main()

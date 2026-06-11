@@ -222,7 +222,6 @@ def _print_aggregate(agg: dict) -> None:
 
     tt = agg["tokens_total"]
     if any(tt.values()):
-        cache_total = tt["cache_read"] + tt["cache_creation"]
         cache_ratio = round(tt["cache_read"] / max(1, tt["input"] + tt["cache_read"]) * 100, 1)
         print(
             f"\nTokens — input: {tt['input']:,}  output: {tt['output']:,}  "

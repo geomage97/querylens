@@ -5,7 +5,7 @@
 // This file is a client component ("use client") because providers hold state.
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import type { Connection } from "@/lib/types";
 import { listConnections } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -45,13 +45,13 @@ function ConnectionProvider({ children }: { children: React.ReactNode }) {
     queryFn: listConnections,
   });
 
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  // Remember the chosen connection across page reloads
-  useEffect(() => {
-    const saved = localStorage.getItem("querylens.connection");
-    if (saved) setActiveId(saved);
-  }, []);
+  // Remember the chosen connection across page reloads. useState accepts a
+  // lazy initializer — it runs once, so we read localStorage there instead of
+  // in an effect (no extra re-render). The window guard covers the server
+  // render, where localStorage doesn't exist.
+  const [activeId, setActiveId] = useState<string | null>(() =>
+    typeof window === "undefined" ? null : localStorage.getItem("querylens.connection"),
+  );
 
   const persistActiveId = (id: string) => {
     setActiveId(id);

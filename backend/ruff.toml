@@ -1,0 +1,5 @@
+target-version = "py311"
+
+[lint.per-file-ignores]
+# Seed scripts are deliberately dense data-generation one-liners.
+"seed/*" = ["E401", "E701", "E702", "E741"]
