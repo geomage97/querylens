@@ -4,9 +4,7 @@
 
 > Built with FastAPI + Claude (`claude-opus-4-8`) with prompt caching, streaming responses, and strict read-only query enforcement — and a Next.js UI with a streaming chat, query inspector, and schema explorer.
 
-![QueryLens chat](docs/screenshots/chat-chart.png)
-
-![QueryLens dashboard](docs/screenshots/dashboard.png)
+![QueryLens demo — ask a question, get a chart, pin it to the dashboard](docs/demo.gif)
 
 ## Quick start
 
@@ -86,19 +84,33 @@ New to React? [frontend/NOTES.md](frontend/NOTES.md) walks through every pattern
 
 The LLM pipeline never touches a database directly — everything goes through the connector interface; PostgreSQL support was added without changing the pipeline at all.
 
+## Screenshots
+
+| Chat with charts | Dashboard |
+|---|---|
+| ![QueryLens chat](docs/screenshots/chat-chart.png) | ![QueryLens dashboard](docs/screenshots/dashboard.png) |
+
 ## Testing & evaluation
 
-Offline tests drive the full pipeline with a scripted fake LLM against the real demo database — no API tokens spent:
+CI (GitHub Actions) runs on every push: `ruff` lint, all three backend test suites against real MongoDB/PostgreSQL service containers, and the frontend lint + production build. **No API key needed** — the pipeline tests inject a scripted fake LLM, and the dashboard tests exercise the LLM-free card-run path.
+
+Run the same suites locally (with the seeded demo databases up):
 
 ```bash
-cd backend && python -m tests.test_pipeline && python -m tests.test_postgres
+cd backend
+python -m ruff check .
+python -m tests.test_pipeline      # full pipeline, fake LLM, real MongoDB
+python -m tests.test_postgres      # SQL validator edge cases + live integration
+python -m tests.test_dashboard     # card CRUD + re-validated LLM-free runs
 ```
 
-The live evaluation suite (with the backend running) sends 62 real questions across categories — basic queries, aggregations, time series, memory/follow-ups, multilingual, security, edge cases — and reports per-category pass rates, p50/p95 latency, and cache hit ratio:
+The live evaluation suite (with the backend running) sends 62 real questions across categories — basic queries, aggregations, joins, time series, memory/follow-ups, multilingual, security, edge cases — and reports per-category pass rates, p50/p95 latency, and cache hit ratio:
 
 ```bash
 cd backend && python -m eval.run_eval
 ```
+
+Latest full run: **62/62 (100%)** — including all 9 security cases, where deliberately malicious prompts ("delete all orders", SQL smuggled in strings, `pg_sleep`, …) must be *blocked by the validator*, not just declined. Typical p50 latency ~6.6s; prompt caching keeps the cache hit ratio around 46% and cuts the API bill by roughly two-thirds.
 
 ## Local development
 
@@ -122,4 +134,8 @@ npm run dev        # http://localhost:3000
 - [x] **Phase 2** — PostgreSQL connector (SQL generation + `information_schema` discovery)
 - [x] **Phase 3** — Next.js frontend: chat, connections manager, schema explorer, query inspector
 - [x] **Phase 4** — Charts (Recharts), pin-to-dashboard, saved queries
-- [ ] **Phase 5** — CI, tests, demo GIF, v1.0
+- [x] **Phase 5** — CI, tests, demo GIF, v1.0
+
+## License
+
+[MIT](LICENSE)
